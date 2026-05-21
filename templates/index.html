@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reputación Pública</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:   #ffffff;fe
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-400:#9ca3af;
+      --gray-500:#6b7280;
+      --gray-700:#374151;
+      --gray-900:#111827;
+      --blue:    #2563eb;
+      --blue-light:#eff6ff;
+      --green:   #059669;
+      --green-light:#ecfdf5;
+      --amber:   #d97706;
+      --amber-light:#fffbeb;
+      --red:     #dc2626;
+      --red-light:#fef2f2;
+      --mono:    'IBM Plex Mono', monospace;
+      --sans:    'Inter', sans-serif;
+      --radius:  8px;
+      --shadow:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    body {
+      background: var(--gray-50);
+      color: var(--gray-900);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 10;
+    }
+
+    .topbar-brand {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .brand-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .brand-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-900);
+      letter-spacing: -.01em;
+    }
+
+    .brand-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-400);
+      background: var(--gray-100);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      margin-bottom: 32px;
+    }
+
+    .page-title h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--gray-900);
+      letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+
+    .page-title p {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    /* ── SEARCH PANEL ── */
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── LABEL ── */
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+
+    /* ── INPUT ── */
+    .name-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--gray-900);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      margin-bottom: 20px;
+    }
+
+    .name-input::placeholder { color: var(--gray-400); }
+
+    .name-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--gray-100);
+      margin: 20px 0;
+    }
+
+    /* ── SLIDER ROW ── */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .slider-label-group { display: flex; flex-direction: column; }
+
+    .slider-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+
+    .slider-hint {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 1px;
+    }
+
+    .slider-number {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--blue);
+      min-width: 48px;
+      text-align: right;
+    }
+
+    /* Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%; height: 2px;
+      background: var(--gray-200);
+      border-radius: 1px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--blue);
+      cursor: pointer;
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 1px var(--blue), var(--shadow);
+      transition: transform .12s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+    /* Presets */
+    .presets {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+
+    .preset {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all .12s;
+    }
+
+    .preset:hover { border-color: var(--gray-300); color: var(--gray-700); }
+
+    .preset.active {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    /* ── SEARCH BTN ── */
+    .search-btn {
+      width: 100%;
+      height: 40px;
+      margin-top: 20px;
+      background: var(--blue);
+      border: none;
+      border-radius: var(--radius);
+      color: var(--white);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .15s, opacity .15s;
+    }
+
+    .search-btn:hover:not(:disabled) { background: #1d4ed8; }
+    .search-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR ── */
+    .error-msg {
+      background: var(--red-light);
+      border: 1px solid #fecaca;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      color: var(--red);
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .stats-row.visible { opacity: 1; }
+
+    .stat {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-n {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+
+    .stat-l {
+      font-size: 11px;
+      color: var(--gray-400);
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      opacity: 0;
+      transition: opacity .3s;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .toolbar.visible { opacity: 1; }
+
+    .filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    .filter-btn {
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all .12s;
+    }
+
+    .filter-btn:hover { border-color: var(--gray-300); color: var(--gray-700); }
+
+    .filter-btn.active {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .export-btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all .12s;
+      display: none;
+    }
+
+    .export-btn.visible { display: inline-flex; align-items: center; gap: 5px; }
+    .export-btn:hover { border-color: var(--gray-300); color: var(--gray-700); }
+
+    /* ── RESULT CARD ── */
+    .results { display: flex; flex-direction: column; gap: 8px; }
+
+    .rcard {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .25s ease, transform .25s ease, border-color .12s;
+      border-left: 3px solid transparent;
+    }
+
+    .rcard.visible { opacity: 1; transform: translateY(0); }
+    .rcard:hover { border-color: var(--gray-300); border-left-color: var(--rcard-accent, var(--gray-300)); }
+
+    .rcard.alta  { --rcard-accent: var(--green); border-left-color: var(--green); }
+    .rcard.media { --rcard-accent: var(--amber); border-left-color: var(--amber); }
+    .rcard.baja  { --rcard-accent: var(--red);   border-left-color: var(--red); }
+
+    .rcard-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .rcard-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-900);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .score-pill {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .score-pill.alta  { background: var(--green-light); color: var(--green); }
+    .score-pill.media { background: var(--amber-light); color: var(--amber); }
+    .score-pill.baja  { background: var(--red-light);   color: var(--red); }
+
+    .rcard-meta {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 8px; flex-wrap: wrap;
+    }
+
+    .platform {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--gray-100);
+      color: var(--gray-500);
+    }
+
+    .homonym-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--amber-light);
+      color: var(--amber);
+    }
+
+    .rcard-snippet {
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .rcard-url {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      word-break: break-all;
+      opacity: .75;
+      transition: opacity .12s;
+    }
+
+    .rcard-url:hover { opacity: 1; }
+
+    /* Score bar */
+    .score-bar {
+      height: 2px;
+      background: var(--gray-100);
+      border-radius: 1px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 1px;
+      transition: width .5s ease;
+    }
+
+    .score-bar-fill.alta  { background: var(--green); }
+    .score-bar-fill.media { background: var(--amber); }
+    .score-bar-fill.baja  { background: var(--red); }
+
+    /* ── EMPTY ── */
+    .empty {
+      text-align: center;
+      padding: 48px 0;
+      color: var(--gray-400);
+      display: none;
+    }
+
+    .empty svg { margin-bottom: 12px; opacity: .3; }
+
+    .empty p { font-size: 13px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding-top: 32px;
+      font-size: 11px;
+      color: var(--gray-400);
+      border-top: 1px solid var(--gray-200);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 560px) {
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .main { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Reputación Pública</span>
+    <span class="brand-tag">v1.0</span>
+  </div>
+  <span style="font-size:11px;color:var(--gray-400);">Solo fuentes públicas</span>
+</nav>
+
+<main class="main">
+
+  <!-- TÍTULO -->
+  <div class="page-title">
+    <h1>Búsqueda de presencia pública</h1>
+    <p>Encuentra menciones, perfiles y colaboraciones de cualquier persona en la web.</p>
+  </div>
+
+  <!-- PANEL DE BÚSQUEDA -->
+  <div class="panel">
+
+    <label class="field-label" for="nombre">Nombre completo</label>
+    <input
+      type="text"
+      id="nombre"
+      class="name-input"
+      placeholder="Ej: Nombre completo"
+      autocomplete="off"
+    >
+
+    <div class="divider"></div>
+
+    <div class="slider-row">
+      <div class="slider-label-group">
+        <span class="slider-title">Porcentaje mínimo de coincidencia</span>
+        <span class="slider-hint" id="slider-hint">Resultados con alta relevancia</span>
+      </div>
+      <span class="slider-number" id="slider-val">70%</span>
+    </div>
+
+    <input type="range" id="slider" min="10" max="95" value="70" step="5">
+
+    <div class="presets">
+      <button class="preset" data-v="25">Amplio · 25%</button>
+      <button class="preset" data-v="50">Moderado · 50%</button>
+      <button class="preset active" data-v="70">Recomendado · 70%</button>
+      <button class="preset" data-v="85">Estricto · 85%</button>
+    </div>
+
+    <button class="search-btn" id="search-btn" onclick="buscar()">
+      <div class="spinner" id="spinner"></div>
+      <span id="btn-txt">Buscar</span>
+    </button>
+
+  </div>
+
+
+  <!-- PROGRESO -->
+  <div id="progress-wrap" style="display:none;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--gray-500);" id="progress-msg">Iniciando búsqueda…</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--gray-400);" id="progress-time">0s</span>
+    </div>
+    <div style="height:2px;background:var(--gray-100);border-radius:1px;overflow:hidden;">
+      <div id="progress-bar" style="height:100%;width:0%;background:var(--blue);border-radius:1px;transition:width .4s ease;"></div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-msg" id="err"></div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="stats">
+    <div class="stat">
+      <div class="stat-n" id="s-total" style="color:var(--blue)">—</div>
+      <div class="stat-l">Hallazgos</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="s-alta" style="color:var(--green)">—</div>
+      <div class="stat-l">Alta confianza</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="s-media" style="color:var(--amber)">—</div>
+      <div class="stat-l">Media confianza</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="s-seg" style="color:var(--gray-500)">—</div>
+      <div class="stat-l">Segundos</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar" id="toolbar">
+    <div class="filter-group">
+      <button class="filter-btn active" data-f="todos">Todos</button>
+      <button class="filter-btn" data-f="alta">Alta confianza</button>
+      <button class="filter-btn" data-f="media">Media</button>
+      <button class="filter-btn" data-f="baja">Baja</button>
+      <button class="filter-btn" data-f="homonimo">⚠ Homonimias</button>
+    </div>
+    <button class="export-btn" id="export-btn" onclick="exportar()">
+      ↓ Exportar .md
+    </button>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="empty" id="empty">
+    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+    </svg>
+    <p>Sin resultados. Prueba bajando el porcentaje de coincidencia.</p>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div class="results" id="results"></div>
+
+  <div class="footer">
+    Solo información de acceso público · Los datos privados son omitidos automáticamente
+  </div>
+
+</main>
+
+<script>
+  let _data = [];
+  let _nombre = '';
+  let _filtro = 'todos';
+
+
+  // ── PROGRESO ANIMADO ──
+  let _progressTimer = null;
+  let _progressSeg = 0;
+
+  const _msgs = [
+    [0,  'Iniciando búsqueda…'],
+    [3,  'Consultando DuckDuckGo…'],
+    [8,  'Buscando en LinkedIn público…'],
+    [13, 'Consultando GitHub…'],
+    [18, 'Procesando resultados…'],
+    [22, 'Calculando relevancia…'],
+    [26, 'Casi listo…'],
+  ];
+
+  function startProgress() {
+    const wrap = document.getElementById('progress-wrap');
+    const bar  = document.getElementById('progress-bar');
+    const msg  = document.getElementById('progress-msg');
+    const seg  = document.getElementById('progress-time');
+    wrap.style.display = 'block';
+    _progressSeg = 0;
+    bar.style.width = '0%';
+
+    _progressTimer = setInterval(() => {
+      _progressSeg++;
+      seg.textContent = _progressSeg + 's';
+      // Avance suave que nunca llega al 100%
+      const pct = Math.min(92, (_progressSeg / 30) * 100);
+      bar.style.width = pct + '%';
+      // Mensaje según tiempo
+      const m = [..._msgs].reverse().find(([t]) => _progressSeg >= t);
+      if (m) msg.textContent = m[1];
+    }, 1000);
+  }
+
+  function stopProgress() {
+    clearInterval(_progressTimer);
+    const bar  = document.getElementById('progress-bar');
+    const msg  = document.getElementById('progress-msg');
+    bar.style.width = '100%';
+    msg.textContent = 'Búsqueda completada';
+    setTimeout(() => {
+      document.getElementById('progress-wrap').style.display = 'none';
+    }, 800);
+  }
+
+  // ── SLIDER ──
+  const slider   = document.getElementById('slider');
+  const sliderV  = document.getElementById('slider-val');
+  const sliderH  = document.getElementById('slider-hint');
+
+  const hints = {
+    10:'Muy amplio — puede incluir resultados poco relacionados',
+    25:'Búsqueda amplia — mayor cobertura',
+    50:'Equilibrio entre cobertura y precisión',
+    70:'Alta relevancia — configuración recomendada',
+    85:'Solo coincidencias muy precisas',
+    95:'Máxima precisión — puede perder resultados válidos',
+  };
+
+  function syncSlider() {
+    const v = +slider.value;
+    sliderV.textContent = v + '%';
+    const k = Object.keys(hints).reduce((p,c) => Math.abs(c-v) < Math.abs(p-v) ? c : p);
+    sliderH.textContent = hints[k];
+    document.querySelectorAll('.preset').forEach(b =>
+      b.classList.toggle('active', +b.dataset.v === v)
+    );
+  }
+
+  slider.addEventListener('input', syncSlider);
+  syncSlider();
+
+  document.querySelectorAll('.preset').forEach(b =>
+    b.addEventListener('click', () => { slider.value = b.dataset.v; syncSlider(); })
+  );
+
+  // Enter
+  document.getElementById('nombre').addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar();
+  });
+
+  // ── FILTROS ──
+  document.querySelectorAll('.filter-btn').forEach(b =>
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      _filtro = b.dataset.f;
+      render();
+    })
+  );
+
+  // ── BUSCAR ──
+  async function buscar() {
+    const nombre   = document.getElementById('nombre').value.trim();
+    const minScore = +slider.value;
+
+    if (!nombre || nombre.length < 3) {
+      showErr('Ingresa un nombre válido (mínimo 3 caracteres)');
+      return;
+    }
+
+    _nombre = nombre;
+    setLoading(true);
+    hideErr();
+    clearResults();
+    startProgress();
+
+    try {
+      const r = await fetch('/buscar', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({nombre, min_score: minScore}),
+      });
+      const d = await r.json();
+
+      if (!r.ok) { showErr(d.error || 'Error en la búsqueda'); return; }
+
+      _data = d.resultados || [];
+      showStats(d.stats);
+      render();
+    } catch {
+      showErr('No se pudo conectar con el servidor. ¿Está corriendo app.py?');
+    } finally {
+      setLoading(false);
+      stopProgress();
+    }
+  }
+
+  // ── RENDER ──
+  function render() {
+    const list  = document.getElementById('results');
+    const empty = document.getElementById('empty');
+    list.innerHTML = '';
+
+    let items = _data;
+    if (_filtro === 'alta')    items = _data.filter(r => r.confianza === 'alta');
+    if (_filtro === 'media')   items = _data.filter(r => r.confianza === 'media');
+    if (_filtro === 'baja')    items = _data.filter(r => r.confianza === 'baja');
+    if (_filtro === 'homonimo') items = _data.filter(r => r.posible_homonimo);
+
+    empty.style.display = items.length ? 'none' : 'block';
+    document.getElementById('export-btn').classList.toggle('visible', _data.length > 0);
+
+    items.forEach((r, i) => {
+      const c = r.confianza || 'baja';
+      const s = r.score || 0;
+      const el = document.createElement('div');
+      el.className = `rcard ${c}`;
+      el.innerHTML = `
+        <div class="rcard-top">
+          <div class="rcard-title">${x(r.titulo || 'Sin título')}</div>
+          <span class="score-pill ${c}">${s}%</span>
+        </div>
+        <div class="rcard-meta">
+          <span class="platform">${x(r.plataforma || 'Web')}</span>
+          ${r.posible_homonimo ? '<span class="homonym-tag">⚠ Posible homonimia</span>' : ''}
+        </div>
+        ${r.snippet ? `<div class="rcard-snippet">${x(r.snippet.slice(0,260))}${r.snippet.length>260?'…':''}</div>` : ''}
+        ${r.url ? `<a class="rcard-url" href="${x(r.url)}" target="_blank" rel="noopener">${x(r.url)}</a>` : ''}
+        <div class="score-bar"><div class="score-bar-fill ${c}" style="width:${s}%"></div></div>
+      `;
+      list.appendChild(el);
+      setTimeout(() => el.classList.add('visible'), i * 50);
+    });
+  }
+
+  // ── STATS ──
+  function showStats(s) {
+    if (!s) return;
+    document.getElementById('s-total').textContent = s.total  ?? 0;
+    document.getElementById('s-alta').textContent  = s.alta   ?? 0;
+    document.getElementById('s-media').textContent = s.media  ?? 0;
+    document.getElementById('s-seg').textContent   = s.duracion ?? '—';
+    document.getElementById('stats').classList.add('visible');
+    document.getElementById('toolbar').classList.add('visible');
+  }
+
+  // ── EXPORTAR ──
+  async function exportar() {
+    const r = await fetch('/exportar', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({nombre: _nombre, resultados: _data}),
+    });
+    const blob = await r.blob();
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `reporte_${_nombre.replace(/\s+/g,'_').toLowerCase()}.md`,
+    });
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ── HELPERS ──
+  function setLoading(on) {
+    document.getElementById('spinner').style.display = on ? 'block' : 'none';
+    document.getElementById('btn-txt').textContent   = on ? 'Buscando…' : 'Buscar';
+    document.getElementById('search-btn').disabled   = on;
+  }
+
+  function showErr(m) {
+    const e = document.getElementById('err');
+    e.textContent = m; e.style.display = 'block';
+  }
+
+  function hideErr() { document.getElementById('err').style.display = 'none'; }
+
+  function clearResults() {
+    document.getElementById('results').innerHTML = '';
+    document.getElementById('empty').style.display = 'none';
+    document.getElementById('stats').classList.remove('visible');
+    document.getElementById('toolbar').classList.remove('visible');
+    document.getElementById('export-btn').classList.remove('visible');
+  }
+
+  function x(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>

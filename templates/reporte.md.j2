@@ -1,0 +1,105 @@
+# Reporte de Presencia Pública: {{ nombre }}
+
+**Fecha de búsqueda:** {{ fecha }}
+
+---
+
+## Resumen de Resultados
+
+| Fuente | Resultados |
+|---|---|
+| Web (DuckDuckGo) | {{ stats.web }} |
+| Reddit | {{ stats.reddit }} |
+| GitHub — Usuarios | {{ stats.github_usuarios }} |
+| GitHub — Repositorios | {{ stats.github_repositorios }} |
+| **Total** | **{{ stats.total }}** |
+
+{% if analisis %}
+---
+
+## Análisis con IA
+
+{{ analisis }}
+
+{% endif %}
+---
+
+## Resultados Web
+
+{% if web %}
+{% for r in web %}
+### {{ loop.index }}. {{ r.title }}
+
+- **URL:** {{ r.url }}
+- **Fragmento:** {{ r.snippet }}
+
+{% endfor %}
+{% else %}
+*Sin resultados en búsqueda web.*
+{% endif %}
+
+---
+
+## Reddit
+
+{% if reddit %}
+{% for r in reddit %}
+### {{ loop.index }}. {{ r.title }}
+
+- **Comunidad:** r/{{ r.subreddit }}
+- **Score:** {{ r.score }}
+- **Autor:** u/{{ r.author }}
+- **Enlace:** {{ r.url }}
+{% if r.body %}
+- **Contenido:** {{ r.body[:300] }}{% if r.body | length > 300 %}...{% endif %}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*Sin resultados en Reddit.*
+{% endif %}
+
+---
+
+## GitHub
+
+{% if github %}
+{% set usuarios = github | selectattr("tipo", "equalto", "usuario") | list %}
+{% set repositorios = github | selectattr("tipo", "equalto", "repositorio") | list %}
+{% if usuarios %}
+### Usuarios
+
+{% for u in usuarios %}
+#### {{ u.nombre }}
+
+- **URL:** {{ u.url }}
+{% if u.extras.nombre_completo %}- **Nombre completo:** {{ u.extras.nombre_completo }}{% endif %}
+{% if u.descripcion %}- **Bio:** {{ u.descripcion }}{% endif %}
+- **Repos públicos:** {{ u.extras.repos_publicos }}
+- **Seguidores:** {{ u.extras.seguidores }}
+{% if u.extras.empresa %}- **Empresa:** {{ u.extras.empresa }}{% endif %}
+{% if u.extras.ubicacion %}- **Ubicación:** {{ u.extras.ubicacion }}{% endif %}
+
+{% endfor %}
+{% endif %}
+{% if repositorios %}
+### Repositorios
+
+{% for r in repositorios %}
+#### {{ r.nombre }}
+
+- **URL:** {{ r.url }}
+{% if r.descripcion %}- **Descripción:** {{ r.descripcion }}{% endif %}
+- **Estrellas:** {{ r.extras.estrellas }}
+- **Lenguaje:** {{ r.extras.lenguaje or "N/A" }}
+- **Forks:** {{ r.extras.forks }}
+
+{% endfor %}
+{% endif %}
+{% else %}
+*Sin resultados en GitHub.*
+{% endif %}
+
+---
+
+*Generado por Agente de Búsqueda Pública — {{ fecha }}*
