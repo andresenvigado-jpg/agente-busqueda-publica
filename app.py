@@ -3,6 +3,7 @@ app.py — Servidor Flask para el agente de búsqueda pública.
 Compatible con cualquier versión de searcher.py del proyecto.
 """
 
+import os
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -14,13 +15,9 @@ app = Flask(__name__)
 
 
 def _importar_busquedas():
-    """Importa dinámicamente las funciones disponibles en searcher.py."""
     import importlib
     searcher = importlib.import_module("agent.searcher")
-
     funciones = {}
-
-    # Intentar todas las variantes de nombres posibles
     for nombre_fn, clave in [
         ("search_web",              "web"),
         ("buscar_web",              "web"),
@@ -33,33 +30,26 @@ def _importar_busquedas():
     ]:
         if hasattr(searcher, nombre_fn):
             funciones[clave] = getattr(searcher, nombre_fn)
-
-    # Alternativa: si tiene buscar_todo / search_all
     if hasattr(searcher, "buscar_todo"):
         funciones["_todo"] = searcher.buscar_todo
     if hasattr(searcher, "search_all"):
         funciones["_todo"] = searcher.search_all
-
     return funciones
 
 
 def ejecutar_busqueda(nombre: str, min_score: int) -> dict:
     from agent.processor import procesar
-
     inicio = time.time()
     funciones = _importar_busquedas()
     resultados_crudos = {"web": [], "reddit": [], "github": [], "linkedin": []}
 
-    # Si tiene función todo-en-uno
     if "_todo" in funciones:
         try:
             resultados_crudos = funciones["_todo"](nombre)
         except Exception as e:
             print(f"[ERROR] buscar_todo: {e}")
     else:
-        # Ejecutar fuentes disponibles en paralelo
         tareas = {k: v for k, v in funciones.items() if not k.startswith("_")}
-
         with ThreadPoolExecutor(max_workers=4) as executor:
             futuros = {executor.submit(fn, nombre): fuente
                        for fuente, fn in tareas.items()}
@@ -71,7 +61,6 @@ def ejecutar_busqueda(nombre: str, min_score: int) -> dict:
                     print(f"[ERROR] {fuente}: {e}")
                     resultados_crudos[fuente] = []
 
-    # Procesar con min_score dinámico
     try:
         import inspect
         sig = inspect.signature(procesar)
@@ -79,14 +68,12 @@ def ejecutar_busqueda(nombre: str, min_score: int) -> dict:
             resultados = procesar(resultados_crudos, nombre, min_score=min_score)
         else:
             resultados = procesar(resultados_crudos, nombre)
-            # Filtrar manualmente si procesar no acepta min_score
             resultados = [r for r in resultados if r.get("score", 0) >= min_score]
     except Exception as e:
         print(f"[ERROR] procesar: {e}")
         resultados = []
 
     duracion = round(time.time() - inicio, 1)
-
     stats = {
         "total":     len(resultados),
         "alta":      sum(1 for r in resultados if r.get("confianza") == "alta"),
@@ -96,7 +83,6 @@ def ejecutar_busqueda(nombre: str, min_score: int) -> dict:
         "duracion":  duracion,
         "fuentes":   list({r.get("plataforma", "") for r in resultados}),
     }
-
     return {"resultados": resultados, "stats": stats, "nombre": nombre}
 
 
@@ -110,10 +96,8 @@ def buscar():
     data      = request.get_json()
     nombre    = (data.get("nombre") or "").strip()
     min_score = int(data.get("min_score", 40))
-
     if not nombre or len(nombre) < 3:
         return jsonify({"error": "Ingresa un nombre válido (mínimo 3 caracteres)"}), 400
-
     try:
         resultado = ejecutar_busqueda(nombre, min_score)
         return jsonify(resultado)
@@ -127,7 +111,6 @@ def exportar():
     data       = request.get_json()
     nombre     = data.get("nombre", "desconocido")
     resultados = data.get("resultados", [])
-
     ruta = generate_report(
         name=nombre,
         results=resultados,
@@ -136,10 +119,8 @@ def exportar():
         duracion_seg=0,
         output_dir="./reportes",
     )
-
     with open(ruta, "r", encoding="utf-8") as f:
         contenido = f.read()
-
     nombre_archivo = ruta.replace("\\", "/").split("/")[-1]
     return Response(
         contenido,
@@ -148,7 +129,10 @@ def exportar():
     )
 
 
+# ── Puerto dinámico para Render y otros servicios cloud ──
 if __name__ == "__main__":
-    print("\n  Agente de Reputación Pública")
-    print("  Abre tu navegador en: http://localhost:5000\n")
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_ENV", "production") != "production"
+    print(f"\n  Agente de Reputación Pública")
+    print(f"  Servidor en: http://0.0.0.0:{port}\n")
+    app.run(host="0.0.0.0", port=port, debug=debug)
