@@ -755,7 +755,7 @@
       showStats(d.stats);
       render();
     } catch {
-      showErr('No se pudo conectar con el servidor. ¿Está corriendo app.py?');
+       showErr('Error de conexión. El servidor puede estar iniciando (espera 30s y reintenta).');
     } finally {
       setLoading(false);
       stopProgress();

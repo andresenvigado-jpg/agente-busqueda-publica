@@ -98,11 +98,23 @@ def buscar():
     min_score = int(data.get("min_score", 40))
     if not nombre or len(nombre) < 3:
         return jsonify({"error": "Ingresa un nombre válido (mínimo 3 caracteres)"}), 400
+    
     try:
         resultado = ejecutar_busqueda(nombre, min_score)
         return jsonify(resultado)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        print(f"[ERROR COMPLETO]\n{traceback.format_exc()}")
+        return jsonify({
+            "resultados": [],
+            "stats": {
+                "total": 0, "alta": 0, "media": 0,
+                "baja": 0, "homonimos": 0,
+                "duracion": 0, "fuentes": []
+            },
+            "nombre": nombre,
+            "advertencia": f"Búsqueda incompleta: {str(e)}"
+        })
 
 
 @app.route("/exportar", methods=["POST"])
